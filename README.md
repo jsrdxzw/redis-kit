@@ -2,7 +2,15 @@
 
 this utils use local sync lock and redis lock to provide high performance
 
-### Example
+### Firstly import redis maven pom
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency> 
+```
+
+### Use Example
 ```java
 @Configuration
 public class DistributedLockConf{
@@ -28,5 +36,20 @@ public class UserService{
             RLock.unlock();
         }
     }
+}
+```
+If you use the annotation, please import the spring aop at the first place
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+```
+
+```java
+// @DistributedLock(lockKey = "haha")
+@DistributedTryLock(lockKey = "haha", waitTime = 10)
+public void method() {
+   //...
 }
 ```
