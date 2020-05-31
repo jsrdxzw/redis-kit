@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * @date 2020/05/31
  */
 @Configuration
-public class DistributedLockConfiguration {
+public class DistributedLockAutoConfiguration {
     @Bean
     public RedisLockFactory redisLockFactory(StringRedisTemplate stringRedisTemplate) {
         return new DefaultRedisLockFactory(stringRedisTemplate);
