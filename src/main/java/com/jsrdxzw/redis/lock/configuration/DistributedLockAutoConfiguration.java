@@ -1,5 +1,7 @@
-package com.jsrdxzw.redis.lock;
+package com.jsrdxzw.redis.lock.configuration;
 
+import com.jsrdxzw.redis.lock.DefaultRedisLockFactory;
+import com.jsrdxzw.redis.lock.RedisLockFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;

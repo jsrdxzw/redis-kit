@@ -24,6 +24,9 @@ public final class DefaultRedisLock implements RedisLock {
     private final long expireTime;
     private final TimeUnit expireTimeUnit;
 
+    /**
+     * obtain lock script
+     */
     private static final String OBTAIN_LOCK = "local lockClientId = redis.call('GET', KEYS[1])\n" +
             "if lockClientId == ARGV[1] then\n" +
             "    redis.call('PEXPIRE', KEYS[1], ARGV[2])\n" +
@@ -35,6 +38,9 @@ public final class DefaultRedisLock implements RedisLock {
             "    return false\n" +
             "end";
 
+    /**
+     * remove key script
+     */
     private static final String REMOVE_LOCK = "local lockClientId = redis.call('GET', KEYS[1])\n" +
             "if lockClientId == ARGV[1] then\n" +
             "    redis.call('DEL', KEYS[1])\n" +
