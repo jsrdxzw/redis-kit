@@ -1,2 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.jsrdxzw.redis.lock.configuration.DistributedLockAutoConfiguration
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.jsrdxzw.redis.operator.configuration.RedisOperatorConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.jsrdxzw.redis.RedisKitConfiguration

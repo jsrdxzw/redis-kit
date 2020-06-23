@@ -15,15 +15,15 @@ import java.util.Optional;
  */
 public class SimpleRateLimit implements RateLimit {
 
-    private static final String RATE_LIMIT_SCRIPT = "local key = KYES[1]\n" +
+    private static final String RATE_LIMIT_SCRIPT = "local key = KEYS[1]\n" +
             "if key ~= nil then\n" +
             "    local current = tonumber(redis.call('GET', key))\n" +
             "    local limit = tonumber(ARGV[1])\n" +
             "    local expire = tonumber(ARGV[2])\n" +
-            "    if current ~= nil and current <= limit then\n" +
+            "    if current == nil or current <= limit then\n" +
             "        local v = redis.call('INCR', key)\n" +
             "        if v == 1 then\n" +
-            "            redis.expire(key, expire)\n" +
+            "            redis.call('EXPIRE', key, expire)\n" +
             "        end\n" +
             "        return true\n" +
             "    end\n" +
@@ -44,7 +44,8 @@ public class SimpleRateLimit implements RateLimit {
         return Optional.ofNullable(stringRedisTemplate.execute(
                 redisScript,
                 Collections.singletonList(key),
-                limit, second
+                String.valueOf(limit),
+                String.valueOf(second)
         )).orElse(false);
     }
 }
