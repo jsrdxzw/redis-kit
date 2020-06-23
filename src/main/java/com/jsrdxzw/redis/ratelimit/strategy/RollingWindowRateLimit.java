@@ -4,6 +4,7 @@ import com.jsrdxzw.redis.ratelimit.RateLimit;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -44,6 +45,7 @@ public class RollingWindowRateLimit implements RateLimit {
 
     @Override
     public boolean acquire(String key, Integer limit, Integer second, Integer expire) {
+        Assert.hasLength(key, "key can not be null");
         Instant instant = Instant.now();
         int millisecond = second * 1000;
         return Optional.ofNullable(stringRedisTemplate.execute(rateLimitScript,
