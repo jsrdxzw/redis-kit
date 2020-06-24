@@ -20,7 +20,7 @@ public class SimpleRateLimit implements RateLimit {
             "    local current = tonumber(redis.call('GET', key))\n" +
             "    local limit = tonumber(ARGV[1])\n" +
             "    local expire = tonumber(ARGV[2])\n" +
-            "    if current == nil or current <= limit then\n" +
+            "    if current == nil or current < limit then\n" +
             "        local v = redis.call('INCR', key)\n" +
             "        if v == 1 then\n" +
             "            redis.call('EXPIRE', key, expire)\n" +
