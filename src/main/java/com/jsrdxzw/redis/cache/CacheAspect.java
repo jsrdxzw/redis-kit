@@ -35,7 +35,6 @@ public class CacheAspect {
 
     @Pointcut("@annotation(com.jsrdxzw.redis.cache.Delete)")
     private void delete() {
-
     }
 
     @SuppressWarnings("unchecked")
@@ -47,17 +46,20 @@ public class CacheAspect {
         Assert.hasLength(key, "cache key must not be null!");
         String value = stringRedisTemplate.opsForValue().get(key);
         if (!StringUtils.isEmpty(value)) {
-            return mapper.readValue(value, signature.getReturnType());
+            try {
+                return mapper.readValue(value, signature.getReturnType());
+            } catch (JsonProcessingException e) {
+                // maybe user changed the return type but old value still stayed in redis
+                return getReturnValueAndSet(pjp, annotation, key);
+            }
         }
-        Object result = pjp.proceed();
-        stringRedisTemplate.opsForValue().set(key, mapper.writeValueAsString(result), annotation.expireTime(), annotation.timeUnit());
-        return result;
+        return getReturnValueAndSet(pjp, annotation, key);
     }
 
     @AfterReturning(value = "put()", returning = "value")
     public Object putCache(JoinPoint pjp, Object value) throws JsonProcessingException {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
-        Cache annotation = signature.getMethod().getAnnotation(Cache.class);
+        Put annotation = signature.getMethod().getAnnotation(Put.class);
         String key = annotation.key();
         Assert.hasLength(key, "cache key must not be null!");
         stringRedisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), annotation.expireTime(), annotation.timeUnit());
@@ -67,8 +69,14 @@ public class CacheAspect {
     @Before("delete()")
     public void deleteCache(JoinPoint pjp) {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
-        Cache annotation = signature.getMethod().getAnnotation(Cache.class);
+        Delete annotation = signature.getMethod().getAnnotation(Delete.class);
         String key = annotation.key();
         stringRedisTemplate.delete(key);
+    }
+
+    private Object getReturnValueAndSet(ProceedingJoinPoint pjp, Cache annotation, String key) throws Throwable {
+        Object result = pjp.proceed();
+        stringRedisTemplate.opsForValue().set(key, mapper.writeValueAsString(result), annotation.expireTime(), annotation.timeUnit());
+        return result;
     }
 }
