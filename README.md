@@ -1,6 +1,6 @@
-## Redis Distributed Lock
+## Redis Distributed Kit
 
-this utils use local sync lock and redis lock to provide high performance
+this utils use local sync lock and redis lock to provide high performance redis utils
 
 ### Firstly import redis maven pom
 ```xml
