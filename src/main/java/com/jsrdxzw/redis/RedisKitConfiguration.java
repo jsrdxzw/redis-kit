@@ -14,7 +14,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * @author xuzhiwei
- * @date 2020/06/23
  */
 @ConfigurationProperties(prefix = "redis-kit")
 @Configuration

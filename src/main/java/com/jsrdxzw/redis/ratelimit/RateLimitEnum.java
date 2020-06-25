@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 /**
  * @author xuzhiwei
- * @date 2020/06/25
  */
 public enum RateLimitEnum implements RateLimitCreator {
     /**

@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author xuzhiwei
- * @date 2020/05/23
  * this is the Distributed Redis Lock
  */
 public interface RedisLock {

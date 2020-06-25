@@ -11,7 +11,6 @@ import java.util.Optional;
 
 /**
  * @author xuzhiwei
- * @date 2020-06-23
  */
 public class SimpleRateLimit implements RateLimit {
 

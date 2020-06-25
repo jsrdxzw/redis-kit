@@ -11,7 +11,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xuzhiwei
- * @date 2020/05/23
  */
 public final class DefaultRedisLock implements RedisLock {
 

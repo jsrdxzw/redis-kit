@@ -4,7 +4,6 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author xuzhiwei
- * @date 2020/06/21
  * this is the atomic operator of redis such as add and get
  */
 public interface RedisKit {

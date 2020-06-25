@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author xuzhiwei
- * @date 2020/05/31
  */
 @Component
 @Aspect
