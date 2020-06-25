@@ -5,7 +5,9 @@ import com.jsrdxzw.redis.lock.RedisLockFactory;
 import com.jsrdxzw.redis.operator.RedisKit;
 import com.jsrdxzw.redis.operator.impl.RedisKitImpl;
 import com.jsrdxzw.redis.ratelimit.RateLimit;
-import com.jsrdxzw.redis.ratelimit.strategy.SimpleRateLimit;
+import com.jsrdxzw.redis.ratelimit.RateLimitEnum;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -14,8 +16,20 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * @author xuzhiwei
  * @date 2020/06/23
  */
+@ConfigurationProperties(prefix = "redis-kit")
 @Configuration
+@ConditionalOnClass({StringRedisTemplate.class})
 public class RedisKitConfiguration {
+
+    private String rateLimit = "default";
+
+    public String getRateLimit() {
+        return rateLimit;
+    }
+
+    public void setRateLimit(String rateLimit) {
+        this.rateLimit = rateLimit;
+    }
 
     @Bean
     public RedisLockFactory redisLockFactory(StringRedisTemplate stringRedisTemplate) {
@@ -29,6 +43,6 @@ public class RedisKitConfiguration {
 
     @Bean
     public RateLimit rateLimit(StringRedisTemplate stringRedisTemplate) {
-        return new SimpleRateLimit(stringRedisTemplate);
+        return RateLimitEnum.fromName(rateLimit).createRateLimit(stringRedisTemplate);
     }
 }

@@ -10,7 +10,7 @@ this utils use local sync lock and redis lock to provide high performance
 </dependency> 
 ```
 
-### Use Example
+### Use Distributed Lock
 ```java
 @Configuration
 public class DistributedLockConf{
@@ -26,7 +26,7 @@ public class UserService{
     @Autowired
     private RedisLockFactory redisLockFactory;
     public void method() {
-        RedisLock RLock = redisLockFactory.getLock("hello");
+        RedisLock RLock = redisLockFactory.getLock("xzw");
         try {
             //RLock.lock();
             RLock.tryLock(30, TimeUnit.SECONDS);
@@ -38,7 +38,7 @@ public class UserService{
     }
 }
 ```
-If you use the annotation, please import the spring aop at the first place
+If you want to use annotation, please import the spring aop at the first place
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -48,8 +48,50 @@ If you use the annotation, please import the spring aop at the first place
 
 ```java
 // @DistributedLock(lockKey = "haha")
-@DistributedTryLock(lockKey = "haha", waitTime = 10)
+@DistributedTryLock(lockKey = "xzw", waitTime = 10)
 public void method() {
    //...
 }
+```
+### Redis Cache Example
+
+```java
+@Cache(key="xzw")
+public Student methodName() {
+}
+```
+it will get value from redis and put value in redis if the value is absent
+
+```java
+@Put(key="xzw")
+public Student methodName() {
+}
+```
+it will always update value to redis
+
+```java
+@Delete(key="xzw")
+public void methodName() {
+}
+```
+it will delete value from redis
+
+### rate limit
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Autowired
+private RateLimit rateLimit;
+
+boolean require = rateLimit.acquire("xzw", 5, 10);
+```
+it means we allow 5 requests per seconds, and id the request > 5, it will return false
+
+we have provided two algorithms -- token bucket and rolling window
+token bucket is used by default 
+
+```yaml
+# if you want to use rolling window
+redis-kit:
+  rate-limit: rollingWindow
 ```
