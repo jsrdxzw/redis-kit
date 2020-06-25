@@ -7,7 +7,7 @@ import org.springframework.lang.Nullable;
  * @date 2020/06/21
  * this is the atomic operator of redis such as add and get
  */
-public interface RedisOperator {
+public interface RedisKit {
 
     /**
      * get and increment with given key and step

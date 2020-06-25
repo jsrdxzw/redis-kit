@@ -1,6 +1,6 @@
 package com.jsrdxzw.redis.operator.impl;
 
-import com.jsrdxzw.redis.operator.RedisOperator;
+import com.jsrdxzw.redis.operator.RedisKit;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -13,7 +13,7 @@ import java.util.Collections;
  * @author xuzhiwei
  * @date 2020/06/21
  */
-public class RedisOperatorImpl implements RedisOperator {
+public class RedisKitImpl implements RedisKit {
 
     private final RedisScript<Long> getAndIncrementRedisScript;
     private final RedisScript<Long> incrementAndGetRedisScript;
@@ -40,7 +40,7 @@ public class RedisOperatorImpl implements RedisOperator {
             "    return result\n" +
             "end";
 
-    public RedisOperatorImpl(StringRedisTemplate stringRedisTemplate) {
+    public RedisKitImpl(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.getAndIncrementRedisScript = new DefaultRedisScript<>(GET_AND_INCREMENT_SCRIPT, Long.class);
         this.incrementAndGetRedisScript = new DefaultRedisScript<>(INCREMENT_AND_GET_SCRIPT, Long.class);

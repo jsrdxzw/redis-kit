@@ -2,8 +2,8 @@ package com.jsrdxzw.redis;
 
 import com.jsrdxzw.redis.lock.DefaultRedisLockFactory;
 import com.jsrdxzw.redis.lock.RedisLockFactory;
-import com.jsrdxzw.redis.operator.RedisOperator;
-import com.jsrdxzw.redis.operator.impl.RedisOperatorImpl;
+import com.jsrdxzw.redis.operator.RedisKit;
+import com.jsrdxzw.redis.operator.impl.RedisKitImpl;
 import com.jsrdxzw.redis.ratelimit.RateLimit;
 import com.jsrdxzw.redis.ratelimit.strategy.SimpleRateLimit;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +23,8 @@ public class RedisKitConfiguration {
     }
 
     @Bean
-    public RedisOperator redisOperator(StringRedisTemplate stringRedisTemplate) {
-        return new RedisOperatorImpl(stringRedisTemplate);
+    public RedisKit redisOperator(StringRedisTemplate stringRedisTemplate) {
+        return new RedisKitImpl(stringRedisTemplate);
     }
 
     @Bean

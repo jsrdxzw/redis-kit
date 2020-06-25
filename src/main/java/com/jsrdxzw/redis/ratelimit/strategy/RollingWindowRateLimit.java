@@ -18,22 +18,21 @@ public class RollingWindowRateLimit implements RateLimit {
 
 
     private static final String RATE_LIMIT_SCRIPT = "local now = tonumber(ARGV[1])\n" +
+            "local limit = tonumber(ARGV[2])\n" +
             "local from = now - tonumber(ARGV[3])\n" +
             "local key = KEYS[1]\n" +
-            "local limit = ARGV[2]\n" +
             "if key ~= nil then\n" +
-            "    local count = redis.call('ZREMRANGEBYSCORE', key, '-inf', from)\n" +
-            "    if count <= limit then\n" +
-            "        redis.call('ZREMRANGEBYSCORE', key, '-inf', from)\n" +
+            "    redis.call('ZREMRANGEBYSCORE', key, '-inf', from)\n" +
+            "    local count = redis.call('ZCARD', key)\n" +
+            "    if count < limit then\n" +
             "        redis.call('ZADD', key, now, now)\n" +
             "        if ARGV[4] ~= 'null' then\n" +
             "            redis.call('EXPIRE', key, ARGV[4])\n" +
             "        end\n" +
             "        return true\n" +
-            "    else\n" +
-            "        return false\n" +
             "    end\n" +
-            "end";
+            "end\n" +
+            "return false";
 
     private final RedisScript<Boolean> rateLimitScript;
     private final StringRedisTemplate stringRedisTemplate;
