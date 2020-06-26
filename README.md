@@ -5,12 +5,18 @@ this utils use local sync lock and redis lock to provide high performance redis 
 ### Firstly import redis maven pom
 ```xml
 <dependency>
+    <groupId>com.github.jsrdxzw</groupId>
+    <artifactId>redis-kit-spring-boot-starter</artifactId>
+    <version>1.0.1</version>
+</dependency>
+<dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
 </dependency> 
 ```
 
 ### Use Distributed Lock
+
 ```java
 @Configuration
 public class DistributedLockConf{
