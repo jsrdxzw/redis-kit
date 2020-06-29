@@ -82,6 +82,7 @@ public Student methodName() {
 ```
 it will get value from redis and put value in redis if the value is absent
 
+**notice** it just put the return value to redis, if the method is `void` then it will clear the cache value in redis
 ```java
 @Put(key="xzw")
 public Student methodName() {
