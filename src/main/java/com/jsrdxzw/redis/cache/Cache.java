@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public @interface Cache {
     String key();
 
-    long expireTime() default 30;
+    long expireTime() default 5;
 
     TimeUnit timeUnit() default TimeUnit.MINUTES;
 }

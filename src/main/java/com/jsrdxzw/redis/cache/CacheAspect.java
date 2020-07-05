@@ -55,21 +55,21 @@ public class CacheAspect {
         return getReturnValueAndSet(pjp, annotation, key);
     }
 
-    @AfterReturning(value = "put()", returning = "value")
-    public Object putCache(JoinPoint pjp, Object value) throws JsonProcessingException {
+    @After(value = "put()")
+    public void putCache(JoinPoint pjp) {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Put annotation = signature.getMethod().getAnnotation(Put.class);
         String key = annotation.key();
         Assert.hasLength(key, "cache key must not be null!");
-        stringRedisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), annotation.expireTime(), annotation.timeUnit());
-        return value;
+        stringRedisTemplate.delete(key);
     }
 
-    @Before("delete()")
+    @After("delete()")
     public void deleteCache(JoinPoint pjp) {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Delete annotation = signature.getMethod().getAnnotation(Delete.class);
         String key = annotation.key();
+        Assert.hasLength(key, "cache key must not be null!");
         stringRedisTemplate.delete(key);
     }
 

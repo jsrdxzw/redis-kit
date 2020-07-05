@@ -7,7 +7,7 @@ this utils use local sync lock and redis lock to provide high performance redis 
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -61,28 +61,33 @@ public void method() {
 ```
 ### Redis Cache Example
 
+it will get value from redis and if the key does not exist in redis it will go on next process and put value in redis as cache.
+by default the expired time is `5 minutes`.
 ```java
 @Cache(key="xzw")
 public Student methodName() {
 }
 ```
-it will get value from redis and put value in redis if the value is absent
+it will remove redis value based on [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
 
+it is recommended to use @Transactional annotation
 ```java
+@Transactional(rollbackFor = Throwable.class)
 @Put(key="xzw")
 public Student methodName() {
 }
 ```
-it will always update value to redis
+delete is same as put
 
 ```java
+@Transactional(rollbackFor = Throwable.class)
 @Delete(key="xzw")
 public void methodName() {
 }
 ```
 it will delete value from redis
 
-### rate limit
+### rate limiter
 ```java
 import org.springframework.beans.factory.annotation.Autowired;
 
