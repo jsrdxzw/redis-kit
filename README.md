@@ -1,13 +1,15 @@
 ## Redis Distributed Kit
 
-this utils use local sync lock and redis lock to provide high performance redis utils
+this repo uses local sync lock and redis lock to provide high performance redis tools
 
-### Firstly import redis maven pom
+![distribute_lock](images/distribute-lock.jpg)
+
+### Import Redis Kit in your project
 ```xml
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -15,20 +17,32 @@ this utils use local sync lock and redis lock to provide high performance redis 
 </dependency> 
 ```
 
+```java
+import com.jsrdxzw.redis.core.EnableRedisKit;
+
+@EnableRedisKit
+public class SpringBootApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootApplication.class, args);
+    }
+}
+```
+
 ### Use Distributed Lock
 
-#### by default StringRedisTemplate is used, Of course you can
-choose other redisTemplate
+by default `StringRedisTemplate` is used, Of course you can
+choose other RedisTemplate by yourself.
+
 ```java
 @Configuration
-public class DistributedLockConf{
+public class DistributedLockConfiguration{
     @Bean
     public RedisLockFactory redisLockFactory(StringRedisTemplate redisTemplate){
         return new DefaultRedisLockFactory(redisTemplate);
     }
 }
 ```
-
+use lock in your own business logic code
 ```java
 public class UserService{
     @Autowired
@@ -46,8 +60,8 @@ public class UserService{
     }
 }
 ```
-
-If you want to use annotation such as `@DistributedLock`, `@Cache`, please import the spring aop at the first place
+In the other way, annotations such as `@DistributedLock`, `DistributedTryLock` are also provided, please import the spring aop at the first place
+before using annotations.
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -67,8 +81,8 @@ public class Application{
 
 ### example of distributed lock by annotation
 ```java
-// @DistributedLock(lockKey = "haha")
-@DistributedTryLock(lockKey = "xzw", waitTime = 10)
+// @DistributedLock(lockKey = "your key")
+@DistributedTryLock(lockKey = "your key", waitTime = 10)
 public void method() {
    //...
 }
@@ -82,9 +96,10 @@ by default the expired time is `5 minutes`.
 public Student methodName() {
 }
 ```
-it will remove redis value based on [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
+it will remove redis value based on cache principle -- [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
 
-it is recommended to use @Transactional annotation
+it is recommended to use @Transactional annotation when modifying
+cache values
 
 ```java
 @Transactional(rollbackFor = Throwable.class)
@@ -92,7 +107,7 @@ it is recommended to use @Transactional annotation
 public Student methodName() {
 }
 ```
-delete is same as put
+`@Delete` is same as `@Put`
 
 ```java
 @Transactional(rollbackFor = Throwable.class)
@@ -111,13 +126,13 @@ private RateLimit rateLimit;
 
 boolean require = rateLimit.acquire("xzw", 5, 10);
 ```
-it means we allow 5 requests per seconds, and id the request > 5, it will return false
+it means we allow 5 requests per seconds, and when the request of per second is greater than 5, it will return false
 
-we have provided two algorithms -- token bucket and rolling window
-token bucket is used by default 
+we have provided two algorithms -- token bucket and rolling window.
+token bucket algorithm is used by default 
 
 ```yaml
-# if you want to use rolling window
+# you can change limit algorithm by overriding spring yaml file
 redis-kit:
   rate-limit: rollingWindow
 ```
