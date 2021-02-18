@@ -1,4 +1,6 @@
-package com.jsrdxzw.redis.lock;
+package com.jsrdxzw.redis.lock.factory;
+
+import com.jsrdxzw.redis.lock.RedisLock;
 
 import java.util.concurrent.TimeUnit;
 

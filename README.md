@@ -9,7 +9,7 @@ this repo uses local sync lock and redis lock to provide high performance redis 
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>

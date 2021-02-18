@@ -1,7 +1,8 @@
 package com.jsrdxzw.redis;
 
-import com.jsrdxzw.redis.lock.DefaultRedisLockFactory;
-import com.jsrdxzw.redis.lock.RedisLockFactory;
+import com.jsrdxzw.redis.lock.factory.DefaultRedisLockFactory;
+import com.jsrdxzw.redis.lock.factory.PreloadRedisLockFactory;
+import com.jsrdxzw.redis.lock.factory.RedisLockFactory;
 import com.jsrdxzw.redis.operator.RedisKit;
 import com.jsrdxzw.redis.operator.impl.RedisKitImpl;
 import com.jsrdxzw.redis.ratelimit.RateLimit;
@@ -22,6 +23,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 public class RedisKitConfiguration {
 
     private String rateLimit = "default";
+    private Boolean preload = false;
 
     public String getRateLimit() {
         return rateLimit;
@@ -31,9 +33,20 @@ public class RedisKitConfiguration {
         this.rateLimit = rateLimit;
     }
 
+    public Boolean getPreload() {
+        return preload;
+    }
+
+    public void setPreload(Boolean preload) {
+        this.preload = preload;
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public RedisLockFactory redisLockFactory(StringRedisTemplate stringRedisTemplate) {
+        if (preload) {
+            return new PreloadRedisLockFactory(stringRedisTemplate);
+        }
         return new DefaultRedisLockFactory(stringRedisTemplate);
     }
 
