@@ -9,7 +9,7 @@ this repo uses local sync lock and redis lock to provide high performance redis 
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -80,21 +80,35 @@ public class Application{
 ```
 
 ### example of distributed lock by annotation
+
 ```java
 // @DistributedLock(lockKey = "your key")
 @DistributedTryLock(lockKey = "your key", waitTime = 10)
-public void method() {
-   //...
-}
+public void method(){
+        //...
+        }
 ```
+
+### enable preload mode
+
+we support preload mode from v1.0.4 that means the lua script is preloaded before used. it can save memory and increase
+performance.
+
+```yaml
+# by default preload mode is disabled 
+redis-kit:
+  preload: true
+```
+
 ### Redis Cache Example
 
-it will get value from redis and if the key does not exist in redis it will go on next process and put value in redis as cache.
-by default the expired time is `5 minutes`.
+it will get value from redis and if the key does not exist in redis it will go on next process and put value in redis as
+cache. by default the expired time is `5 minutes`.
+
 ```java
-@Cache(key="xzw")
-public Student methodName() {
-}
+@Cache(key = "xzw")
+public Student methodName(){
+        }
 ```
 it will remove redis value based on cache principle -- [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
 

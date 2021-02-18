@@ -7,14 +7,12 @@ import org.springframework.data.redis.core.script.RedisScript;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xuzhiwei
  */
-public final class DefaultRedisLock implements RedisLock {
+public final class DefaultRedisLock extends AbstractRedisLock {
 
-    private final ReentrantLock lock = new ReentrantLock();
     private final RedisScript<Boolean> obtainRedisScript;
     private final RedisScript<Void> removeRedisScript;
     private final String clientId = UUID.randomUUID().toString();
@@ -55,56 +53,7 @@ public final class DefaultRedisLock implements RedisLock {
     }
 
     @Override
-    public void lock() {
-        try {
-            lock.lock();
-            while (!obtainLockFromRedis()) {
-                Thread.sleep(100);
-            }
-        } catch (InterruptedException ignore) {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean tryLock(long time, TimeUnit timeUnit) {
-        long now = System.currentTimeMillis();
-        try {
-            if (lock.tryLock(time, timeUnit)) {
-                long expire = now + timeUnit.toMillis(time);
-                boolean acquired;
-                while (!(acquired = obtainLockFromRedis()) && System.currentTimeMillis() < expire) {
-                    Thread.sleep(100);
-                }
-                return acquired;
-            }
-        } catch (InterruptedException e) {
-            lock.unlock();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tryLock(long time, TimeUnit timeUnit, int retry) {
-        if (retry <= 0) {
-            return tryLock(time, timeUnit);
-        }
-        boolean acquired;
-        do {
-            acquired = tryLock(time, timeUnit);
-        } while (!acquired && retry-- > 0);
-        return acquired;
-    }
-
-    @Override
-    public void unlock() {
-        if (lock.isHeldByCurrentThread()) {
-            lock.unlock();
-        }
-        removeLockFromRedis();
-    }
-
-    private boolean obtainLockFromRedis() {
+    protected boolean obtainLockFromRedis() {
         Boolean success = stringRedisTemplate.execute(
                 obtainRedisScript,
                 Collections.singletonList(lockKey),
@@ -114,7 +63,8 @@ public final class DefaultRedisLock implements RedisLock {
         return Boolean.TRUE.equals(success);
     }
 
-    private void removeLockFromRedis() {
+    @Override
+    protected void removeLockFromRedis() {
         stringRedisTemplate.execute(
                 removeRedisScript,
                 Collections.singletonList(lockKey),
