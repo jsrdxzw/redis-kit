@@ -1,6 +1,7 @@
 ## Redis Distributed Kit
 
-this repo uses local sync lock and redis lock to provide high performance redis tools
+this repo uses local sync lock and redis lock to provide high performance redis tools This redis kit is recommended in
+single redis machine.
 
 ![distribute_lock](images/distribute-lock.jpg)
 
@@ -9,7 +10,7 @@ this repo uses local sync lock and redis lock to provide high performance redis 
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -30,8 +31,8 @@ public class SpringBootApplication {
 
 ### Use Distributed Lock
 
-by default `StringRedisTemplate` is used, Of course you can
-choose other RedisTemplate by yourself.
+by default `StringRedisTemplate` which is provided by Spring is used, Of course you can choose other RedisTemplate by
+yourself.
 
 ```java
 @Configuration
@@ -43,18 +44,22 @@ public class DistributedLockConfiguration{
 }
 ```
 use lock in your own business logic code
+
 ```java
-public class UserService{
+public class UserService {
     @Autowired
     private RedisLockFactory redisLockFactory;
+
     public void method() {
         RedisLock RLock = redisLockFactory.getLock("xzw");
         try {
-            //RLock.lock();
+            //RLock.lock(); by default the expire time is 60s
+            // set expire time is recommended because busy waiting may cause deadlock
+            // when redis machine is down..
             RLock.tryLock(30, TimeUnit.SECONDS);
             //RLock.tryLock(30, TimeUnit.SECONDS, 3);
             // your own logic
-        } finally{
+        } finally {
             RLock.unlock();
         }
     }
@@ -62,19 +67,24 @@ public class UserService{
 ```
 In the other way, annotations such as `@DistributedLock`, `DistributedTryLock` are also provided, please import the spring aop at the first place
 before using annotations.
+
 ```xml
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
 </dependency>
 ```
-```java
-import org.springframework.boot.autoconfigure.SpringBootApplication;import org.springframework.context.annotation.ComponentScan;@ComponentScan
 
+```java
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+@ComponentScan
 @SpringBootApplication(scanBasePackages = {"your.path", "com.jsrdxzw.redis"})
-public class Application{
+public class Application {
     public static void main(String[] args) {
-            SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }
 ```

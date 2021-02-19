@@ -5,7 +5,6 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.Collections;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,9 +14,6 @@ public final class DefaultRedisLock extends AbstractRedisLock {
 
     private final RedisScript<Boolean> obtainRedisScript;
     private final RedisScript<Void> removeRedisScript;
-    private final String clientId = UUID.randomUUID().toString();
-    private final StringRedisTemplate stringRedisTemplate;
-    private final String lockKey;
     private final long expireTime;
     private final TimeUnit expireTimeUnit;
 
@@ -44,8 +40,7 @@ public final class DefaultRedisLock extends AbstractRedisLock {
             "end";
 
     public DefaultRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit) {
-        this.stringRedisTemplate = stringRedisTemplate;
-        this.lockKey = lockKey;
+        super(stringRedisTemplate, lockKey);
         this.expireTime = expireTime;
         this.expireTimeUnit = expireTimeUnit;
         this.obtainRedisScript = new DefaultRedisScript<>(OBTAIN_LOCK, Boolean.class);
