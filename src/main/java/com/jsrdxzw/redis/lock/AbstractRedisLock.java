@@ -11,12 +11,17 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AbstractRedisLock implements RedisLock {
 
-    private final ReentrantLock lock = new ReentrantLock();
-    protected final String clientId = UUID.randomUUID().toString();
+    private final ReentrantLock lock;
+    /**
+     * each machine has own clientId which is in order to avoid to release other client's lock
+     */
+    protected final String clientId;
     protected final StringRedisTemplate stringRedisTemplate;
     protected final String lockKey;
 
     public AbstractRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey) {
+        this.lock = new ReentrantLock();
+        this.clientId = UUID.randomUUID().toString();
         this.stringRedisTemplate = stringRedisTemplate;
         this.lockKey = lockKey;
     }

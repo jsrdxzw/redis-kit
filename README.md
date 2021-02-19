@@ -1,6 +1,7 @@
 ## Redis Distributed Kit
 
-this repo uses local sync lock and redis lock to provide high performance redis tools
+this repo uses local sync lock and redis lock to provide high performance redis tools This redis kit is recommended in
+single redis machine.
 
 ![distribute_lock](images/distribute-lock.jpg)
 
@@ -66,19 +67,24 @@ public class UserService {
 ```
 In the other way, annotations such as `@DistributedLock`, `DistributedTryLock` are also provided, please import the spring aop at the first place
 before using annotations.
+
 ```xml
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
 </dependency>
 ```
-```java
-import org.springframework.boot.autoconfigure.SpringBootApplication;import org.springframework.context.annotation.ComponentScan;@ComponentScan
 
+```java
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+@ComponentScan
 @SpringBootApplication(scanBasePackages = {"your.path", "com.jsrdxzw.redis"})
-public class Application{
+public class Application {
     public static void main(String[] args) {
-            SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }
 ```

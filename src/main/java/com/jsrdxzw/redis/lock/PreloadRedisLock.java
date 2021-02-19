@@ -20,6 +20,7 @@ public final class PreloadRedisLock extends AbstractRedisLock {
     static {
         OBTAIN_REDIS_SCRIPT = new DefaultRedisScript<>();
         OBTAIN_REDIS_SCRIPT.setLocation(new ClassPathResource("obtain_lock.lua"));
+        OBTAIN_REDIS_SCRIPT.setResultType(Boolean.class);
         REMOVE_REDIS_SCRIPT = new DefaultRedisScript<>();
         REMOVE_REDIS_SCRIPT.setLocation(new ClassPathResource("remove_lock.lua"));
     }
