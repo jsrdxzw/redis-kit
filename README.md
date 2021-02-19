@@ -9,7 +9,7 @@ this repo uses local sync lock and redis lock to provide high performance redis 
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -30,8 +30,8 @@ public class SpringBootApplication {
 
 ### Use Distributed Lock
 
-by default `StringRedisTemplate` is used, Of course you can
-choose other RedisTemplate by yourself.
+by default `StringRedisTemplate` which is provided by Spring is used, Of course you can choose other RedisTemplate by
+yourself.
 
 ```java
 @Configuration
@@ -43,18 +43,22 @@ public class DistributedLockConfiguration{
 }
 ```
 use lock in your own business logic code
+
 ```java
-public class UserService{
+public class UserService {
     @Autowired
     private RedisLockFactory redisLockFactory;
+
     public void method() {
         RedisLock RLock = redisLockFactory.getLock("xzw");
         try {
-            //RLock.lock();
+            //RLock.lock(); by default the expire time is 60s
+            // set expire time is recommended because busy waiting may cause deadlock
+            // when redis machine is down..
             RLock.tryLock(30, TimeUnit.SECONDS);
             //RLock.tryLock(30, TimeUnit.SECONDS, 3);
             // your own logic
-        } finally{
+        } finally {
             RLock.unlock();
         }
     }
