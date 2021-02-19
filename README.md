@@ -95,8 +95,8 @@ public class Application {
 // @DistributedLock(lockKey = "your key")
 @DistributedTryLock(lockKey = "your key", waitTime = 10)
 public void method(){
-        //...
-        }
+   //...
+}
 ```
 
 ### enable preload mode
