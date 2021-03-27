@@ -17,6 +17,6 @@ public class PreloadRedisLockFactory extends AbstractRedisLockFactory {
 
     @Override
     protected RedisLock createRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit) {
-        return new PreloadRedisLock(stringRedisTemplate, lockKey, expireTime, expireTimeUnit);
+        return new PreloadRedisLock(stringRedisTemplate, lockKey, expireTime, expireTimeUnit, CLIENT_ID);
     }
 }

@@ -2,7 +2,7 @@ package com.jsrdxzw.redis.lock;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import java.util.UUID;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AbstractRedisLock implements RedisLock {
 
-    private final ReentrantLock lock;
+    protected final ReentrantLock lock;
     /**
      * each machine has own clientId which is in order to avoid to release other client's lock
      */
@@ -19,9 +19,9 @@ public abstract class AbstractRedisLock implements RedisLock {
     protected final StringRedisTemplate stringRedisTemplate;
     protected final String lockKey;
 
-    public AbstractRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey) {
+    public AbstractRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, String clientId) {
         this.lock = new ReentrantLock();
-        this.clientId = UUID.randomUUID().toString();
+        this.clientId = clientId;
         this.stringRedisTemplate = stringRedisTemplate;
         this.lockKey = lockKey;
     }
@@ -76,15 +76,23 @@ public abstract class AbstractRedisLock implements RedisLock {
 
     @Override
     public void unlock() {
-        if (lock.isHeldByCurrentThread()) {
+        if (!lock.isHeldByCurrentThread()) {
+            throw new IllegalStateException("You do not own lock at " + this.lockKey);
+        }
+        if (lock.getHoldCount() > 1) {
+            lock.unlock();
+            return;
+        }
+        try {
+            removeLockFromRedis();
+        } finally {
             lock.unlock();
         }
-        removeLockFromRedis();
     }
 
     private boolean checkReentrantLock(String lockKey) {
-        String clientId = stringRedisTemplate.opsForValue().get(lockKey);
-        return clientId != null && !clientId.isEmpty();
+        String id = stringRedisTemplate.opsForValue().get(lockKey);
+        return Objects.equals(clientId, id);
     }
 
     /**

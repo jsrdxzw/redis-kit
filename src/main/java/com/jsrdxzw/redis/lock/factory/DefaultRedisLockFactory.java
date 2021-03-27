@@ -17,6 +17,6 @@ public class DefaultRedisLockFactory extends AbstractRedisLockFactory {
 
     @Override
     protected RedisLock createRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit) {
-        return new DefaultRedisLock(stringRedisTemplate, lockKey, expireTime, expireTimeUnit);
+        return new DefaultRedisLock(stringRedisTemplate, lockKey, expireTime, expireTimeUnit, CLIENT_ID);
     }
 }

@@ -25,8 +25,8 @@ public final class PreloadRedisLock extends AbstractRedisLock {
         REMOVE_REDIS_SCRIPT.setLocation(new ClassPathResource("remove_lock.lua"));
     }
 
-    public PreloadRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit) {
-        super(stringRedisTemplate, lockKey);
+    public PreloadRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit, String clientId) {
+        super(stringRedisTemplate, lockKey, clientId);
         this.expireTime = expireTime;
         this.expireTimeUnit = expireTimeUnit;
     }
