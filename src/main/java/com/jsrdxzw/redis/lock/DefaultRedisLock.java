@@ -39,8 +39,8 @@ public final class DefaultRedisLock extends AbstractRedisLock {
             "    redis.call('DEL', KEYS[1])\n" +
             "end";
 
-    public DefaultRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit) {
-        super(stringRedisTemplate, lockKey);
+    public DefaultRedisLock(StringRedisTemplate stringRedisTemplate, String lockKey, long expireTime, TimeUnit expireTimeUnit, String clientId) {
+        super(stringRedisTemplate, lockKey, clientId);
         this.expireTime = expireTime;
         this.expireTimeUnit = expireTimeUnit;
         this.obtainRedisScript = new DefaultRedisScript<>(OBTAIN_LOCK, Boolean.class);

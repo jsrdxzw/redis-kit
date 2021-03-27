@@ -5,16 +5,34 @@ single redis machine.
 
 ![distribute_lock](images/distribute-lock.jpg)
 
+### performance test report
+we use our redis kit to compare with their performance in concurrent environment.
+
+1000qps * 10 count
+
+|  machine  | redisson  | redis-kit | redis-kit (preload mode)
+|  ----  | ----  | ---- | ---- |
+| single instance (lock)  | 5286ms | 5394ms | 5184ms  |
+| two instances (lock)  | 5854ms | 6620ms | 6184ms |
+| single instance (tryLock) | 1271ms | 738ms | 720ms  |
+| two instances (tryLock)  | 2230ms | 1714ms | 1620ms |
+
+*In conclusion, redis-kit is almost as fast as redisson when using lock, but
+when using tryLock the redis-kit is faster about 40% than redisson.*
+
+
 ### Import Redis Kit in your project
+
 ```xml
+
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.0.5</version>
+    <version>1.1.0</version>
 </dependency>
 <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-data-redis</artifactId>
 </dependency> 
 ```
 
@@ -35,14 +53,16 @@ by default `StringRedisTemplate` which is provided by Spring is used, Of course 
 yourself.
 
 ```java
+
 @Configuration
-public class DistributedLockConfiguration{
+public class DistributedLockConfiguration {
     @Bean
-    public RedisLockFactory redisLockFactory(StringRedisTemplate redisTemplate){
+    public RedisLockFactory redisLockFactory(StringRedisTemplate redisTemplate) {
         return new DefaultRedisLockFactory(redisTemplate);
     }
 }
 ```
+
 use lock in your own business logic code
 
 ```java
@@ -65,8 +85,9 @@ public class UserService {
     }
 }
 ```
-In the other way, annotations such as `@DistributedLock`, `DistributedTryLock` are also provided, please import the spring aop at the first place
-before using annotations.
+
+In the other way, annotations such as `@DistributedLock`, `DistributedTryLock` are also provided, please import the
+spring aop at the first place before using annotations.
 
 ```xml
 
@@ -95,7 +116,34 @@ public class Application {
 // @DistributedLock(lockKey = "your key")
 @DistributedTryLock(lockKey = "your key", waitTime = 10)
 public void method(){
-   //...
+        //...
+        }
+```
+
+### Notice
+we don't recommend use redis lock with @Transactional because it may cause visibility problems.
+```java
+@Transactional
+public void reduceStock(Long id) {
+    RedisLock lock = redisLockFactory.getLock("test2");
+    try {
+        lock.lock();
+        SkuStock skuStock = skuStockRepository.getOne(id);
+        Integer stock = skuStock.getStock();
+        if (stock > 0) {
+            log.info("stock is {}", stock);
+            skuStock.setStock(stock - 1);
+            skuStockRepository.save(skuStock);
+        }
+        longAdder.increment();
+        log.info("这是第{}个请求, 改之前的stock:{}", longAdder.longValue(), stock);
+    } finally {
+        // when lock is released by one client, the other client will
+        // get redis lock immediately when Transaction may not commit.
+        // The other client will get old value by using Mysql.
+        lock.unlock();
+    }
+
 }
 ```
 
@@ -120,40 +168,44 @@ cache. by default the expired time is `5 minutes`.
 public Student methodName(){
         }
 ```
-it will remove redis value based on cache principle -- [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
 
-it is recommended to use @Transactional annotation when modifying
-cache values
+it will remove redis value based on cache principle
+-- [Cache aside](https://www.usenix.org/system/files/conference/nsdi13/nsdi13-final170_update.pdf)
+
+it is recommended to use @Transactional annotation when modifying cache values
 
 ```java
 @Transactional(rollbackFor = Throwable.class)
-@Put(key="xzw")
-public Student methodName() {
-}
+@Put(key = "xzw")
+public Student methodName(){
+        }
 ```
+
 `@Delete` is same as `@Put`
 
 ```java
 @Transactional(rollbackFor = Throwable.class)
-@Delete(key="xzw")
-public void methodName() {
-}
+@Delete(key = "xzw")
+public void methodName(){
+        }
 ```
+
 it will delete value from redis
 
 ### rate limiter
+
 ```java
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Autowired
 private RateLimit rateLimit;
 
-boolean require = rateLimit.acquire("xzw", 5, 10);
+        boolean require=rateLimit.acquire("xzw",5,10);
 ```
+
 it means we allow 5 requests per seconds, and when the request of per second is greater than 5, it will return false
 
-we have provided two algorithms -- token bucket and rolling window.
-token bucket algorithm is used by default 
+we have provided two algorithms -- token bucket and rolling window. token bucket algorithm is used by default
 
 ```yaml
 # you can change limit algorithm by overriding spring yaml file

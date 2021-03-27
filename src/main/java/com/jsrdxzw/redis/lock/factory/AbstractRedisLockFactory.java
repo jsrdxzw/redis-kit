@@ -4,6 +4,7 @@ import com.jsrdxzw.redis.lock.RedisLock;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +12,8 @@ import java.util.concurrent.TimeUnit;
  * @author xuzhiwei
  */
 public abstract class AbstractRedisLockFactory implements RedisLockFactory {
-    protected final Map<String, RedisLock> redisLockMap = new ConcurrentHashMap<>();
+    protected static final String CLIENT_ID = UUID.randomUUID().toString();
+    protected static final Map<String, RedisLock> REDIS_LOCK_MAP = new ConcurrentHashMap<>();
 
     protected final StringRedisTemplate stringRedisTemplate;
 
@@ -24,12 +26,7 @@ public abstract class AbstractRedisLockFactory implements RedisLockFactory {
         if (lockKey == null || lockKey.trim().isEmpty()) {
             throw new RuntimeException("lockKey can not be empty!");
         }
-        RedisLock redisLock = redisLockMap.get(lockKey);
-        if (redisLock == null) {
-            redisLock = createRedisLock(stringRedisTemplate, lockKey, expireTime, expireTimeUnit);
-            redisLockMap.putIfAbsent(lockKey, redisLock);
-        }
-        return redisLock;
+        return REDIS_LOCK_MAP.computeIfAbsent(lockKey, (key) -> createRedisLock(stringRedisTemplate, key, expireTime, expireTimeUnit));
     }
 
     /**
