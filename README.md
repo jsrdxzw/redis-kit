@@ -28,7 +28,7 @@ when using tryLock the redis-kit is faster about 40% than redisson.*
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 <dependency>
 <groupId>org.springframework.boot</groupId>
@@ -160,13 +160,34 @@ redis-kit:
 
 ### Redis Cache Example
 
-it will get value from redis and if the key does not exist in redis it will go on next process and put value in redis as
+it will get value from redis and if the key does not exist in redis it will do next process and put value in redis as
 cache. by default the expired time is `5 minutes`.
+redis key can retrieve params from invoked function.
 
 ```java
-@Cache(key = "xzw")
-public Student methodName(){
-        }
+// key = id
+@Cache(key = "id", expireTime = 10, timeUnit = TimeUnit.SECONDS)
+public somethingVo testCache(Integer id) {
+    //
+}
+
+// key = ro.title + ro.name
+@Cache(key = "{title + name}", expireTime = 10, timeUnit = TimeUnit.SECONDS)
+public somethingVo testCache(MerchandiseGroupRo ro) {
+    //
+}
+
+// key = ro.title + id
+@Cache(key = "{title}#id", expireTime = 10, timeUnit = TimeUnit.SECONDS)
+public somethingVo testCache(MerchandiseGroupRo ro, Integer id) {
+    //
+}
+
+// key = "hello"
+@Cache(key = "hello", expireTime = 10, timeUnit = TimeUnit.SECONDS)
+public somethingVo testCache() {
+    //
+}
 ```
 
 it will remove redis value based on cache principle
