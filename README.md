@@ -28,7 +28,7 @@ when using tryLock the redis-kit is faster about 40% than redisson.*
 <dependency>
     <groupId>com.github.jsrdxzw</groupId>
     <artifactId>redis-kit-spring-boot-starter</artifactId>
-    <version>1.2.0</version>
+    <version>2.0.0</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
