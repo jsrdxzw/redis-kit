@@ -1,6 +1,7 @@
 package com.jsrdxzw.redis.core;
 
 import com.jsrdxzw.redis.RedisKitConfiguration;
+import com.jsrdxzw.redis.ratelimit.RateLimitConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,6 +12,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(RedisKitConfiguration.class)
+@Import({RedisKitConfiguration.class, RateLimitConfiguration.class})
 public @interface EnableRedisKit {
 }

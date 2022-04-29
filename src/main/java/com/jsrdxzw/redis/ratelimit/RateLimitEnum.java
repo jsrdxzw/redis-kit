@@ -2,6 +2,7 @@ package com.jsrdxzw.redis.ratelimit;
 
 import com.jsrdxzw.redis.ratelimit.strategy.RollingWindowRateLimit;
 import com.jsrdxzw.redis.ratelimit.strategy.SimpleRateLimit;
+import com.jsrdxzw.redis.ratelimit.strategy.TokenBucketRateLimit;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public enum RateLimitEnum implements RateLimitCreator {
      */
     ROLLING_WINDOW("rollingWindow") {
         @Override
-        public RateLimit createRateLimit(StringRedisTemplate redisTemplate) {
+        public RateLimit createRateLimit(StringRedisTemplate redisTemplate, RateLimitConfiguration configuration) {
             return new RollingWindowRateLimit(redisTemplate);
         }
     },
@@ -24,13 +25,24 @@ public enum RateLimitEnum implements RateLimitCreator {
      */
     DEFAULT_RATE_LIMIT("default") {
         @Override
-        public RateLimit createRateLimit(StringRedisTemplate redisTemplate) {
+        public RateLimit createRateLimit(StringRedisTemplate redisTemplate, RateLimitConfiguration configuration) {
             return new SimpleRateLimit(redisTemplate);
         }
     },
+
+    /**
+     * token bucket rate limit strategy
+     */
+    TOKEN_BUCKET_LIMIT("tokenBucket") {
+        @Override
+        public RateLimit createRateLimit(StringRedisTemplate redisTemplate, RateLimitConfiguration configuration) {
+            return new TokenBucketRateLimit(redisTemplate, configuration);
+        }
+    },
+
     UNKNOWN("unknown") {
         @Override
-        public RateLimit createRateLimit(StringRedisTemplate redisTemplate) {
+        public RateLimit createRateLimit(StringRedisTemplate redisTemplate, RateLimitConfiguration configuration) {
             throw new RuntimeException("unknown rate limit, please set rate limit name correctly in application.yml");
         }
     };
@@ -52,7 +64,8 @@ interface RateLimitCreator {
      * create a rate limit
      *
      * @param redisTemplate StringRedisTemplate
+     * @param configuration
      * @return RateLimit
      */
-    RateLimit createRateLimit(StringRedisTemplate redisTemplate);
+    RateLimit createRateLimit(StringRedisTemplate redisTemplate, RateLimitConfiguration configuration);
 }

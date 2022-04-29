@@ -13,7 +13,7 @@ public interface RateLimit {
      * @param key    user key
      * @param limit  limit request count
      * @param second limit per time
-     * @param expire expire time
+     * @param expire expire time, time unit is seconds
      * @return true if can request
      */
     boolean acquire(String key, Integer limit, Integer second, Integer expire);

@@ -1,12 +1,12 @@
 package com.jsrdxzw.redis;
 
+import com.jsrdxzw.redis.cache.CacheAspect;
+import com.jsrdxzw.redis.lock.DistributedLockAspect;
 import com.jsrdxzw.redis.lock.factory.DefaultRedisLockFactory;
 import com.jsrdxzw.redis.lock.factory.PreloadRedisLockFactory;
 import com.jsrdxzw.redis.lock.factory.RedisLockFactory;
 import com.jsrdxzw.redis.operator.RedisKit;
 import com.jsrdxzw.redis.operator.impl.RedisKitImpl;
-import com.jsrdxzw.redis.ratelimit.RateLimit;
-import com.jsrdxzw.redis.ratelimit.RateLimitEnum;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,16 +22,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @ConditionalOnClass({StringRedisTemplate.class})
 public class RedisKitConfiguration {
 
-    private String rateLimit = "default";
     private Boolean preload = false;
-
-    public String getRateLimit() {
-        return rateLimit;
-    }
-
-    public void setRateLimit(String rateLimit) {
-        this.rateLimit = rateLimit;
-    }
 
     public Boolean getPreload() {
         return preload;
@@ -58,7 +49,13 @@ public class RedisKitConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RateLimit rateLimit(StringRedisTemplate stringRedisTemplate) {
-        return RateLimitEnum.fromName(rateLimit).createRateLimit(stringRedisTemplate);
+    public CacheAspect cacheAspect() {
+        return new CacheAspect();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DistributedLockAspect distributedLockAspect() {
+        return new DistributedLockAspect();
     }
 }

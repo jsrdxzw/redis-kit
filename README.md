@@ -221,15 +221,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Autowired
 private RateLimit rateLimit;
 
-        boolean require=rateLimit.acquire("xzw",5,10);
+boolean require=rateLimit.acquire("xzw",5,10);
 ```
 
 it means we allow 5 requests per seconds, and when the request of per second is greater than 5, it will return false
 
-we have provided two algorithms -- token bucket and rolling window. token bucket algorithm is used by default
+we have provided three distributed limit rate algorithms:
+1. counter [by default]
+2. rolling window
+3. token bucket
 
 ```yaml
 # you can change limit algorithm by overriding spring yaml file
 redis-kit:
-  rate-limit: rollingWindow
+  rate-limit: 
+    strategy: tokenBucket # default, rollingWindow
+    bucket-size: 100 # default is 10
+```
+
+also, Spring AOP is used to support @Annotation features
+
+```java
+import com.jsrdxzw.redis.ratelimit.RateLimiter;
+
+@RateLimiter(key = "123", limit = 10, time = 10, expire = 30)
+public Object method() {
+    
+}
 ```

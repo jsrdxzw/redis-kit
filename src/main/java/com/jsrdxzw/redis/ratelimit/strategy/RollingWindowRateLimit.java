@@ -15,7 +15,6 @@ import java.util.Optional;
  */
 public class RollingWindowRateLimit implements RateLimit {
 
-
     private static final String RATE_LIMIT_SCRIPT = "local now = tonumber(ARGV[1])\n" +
             "local limit = tonumber(ARGV[2])\n" +
             "local from = now - tonumber(ARGV[3])\n" +
@@ -38,7 +37,7 @@ public class RollingWindowRateLimit implements RateLimit {
 
     public RollingWindowRateLimit(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
-        rateLimitScript = new DefaultRedisScript<>(RATE_LIMIT_SCRIPT, Boolean.class);
+        this.rateLimitScript = new DefaultRedisScript<>(RATE_LIMIT_SCRIPT, Boolean.class);
     }
 
     @Override

@@ -29,19 +29,19 @@ public class SimpleRateLimit implements RateLimit {
             "end\n" +
             "return false";
 
-    private final RedisScript<Boolean> redisScript;
+    private final RedisScript<Boolean> rateLimitScript;
     private final StringRedisTemplate stringRedisTemplate;
 
     public SimpleRateLimit(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
-        this.redisScript = new DefaultRedisScript<>(RATE_LIMIT_SCRIPT, Boolean.class);
+        this.rateLimitScript = new DefaultRedisScript<>(RATE_LIMIT_SCRIPT, Boolean.class);
     }
 
     @Override
     public boolean acquire(String key, Integer limit, Integer second, Integer expire) {
         Assert.hasLength(key, "key can not be null");
         return Optional.ofNullable(stringRedisTemplate.execute(
-                redisScript,
+                rateLimitScript,
                 Collections.singletonList(key),
                 String.valueOf(limit),
                 String.valueOf(second)
